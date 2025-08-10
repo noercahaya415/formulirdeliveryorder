@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <style>
-    /* [Styles tetap sama seperti sebelumnya] */
     * {
       margin: 0;
       padding: 0;
@@ -181,7 +180,7 @@
     }
 
     #map-container {
-      height: 300px !important;
+      height: 300px;
       z-index: 1;
       width: 100%;
       margin: 15px 0;
@@ -231,11 +230,9 @@
       }
 
       .leaflet-container {
-  	background-color: #f8f8f8 !important;
+        background-color: #f8f8f8;
       }
-
     }
-    /* ... (seluruh CSS tetap sama) ... */
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -348,7 +345,7 @@
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
   // Konfigurasi
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbweWxvZRM0MDZIEIXAJopo-VHW3K1KtBfjFAKJggq7nA69MVDEdk-qSZE38TUJw1s0rbw/exec";
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyRsuVPGbld8cnVAY1aCaPYyoD49UfdEvLU188VBcZNZKCPcXIkan4QXe_zNIpsFlZ4hA/exec";
   
   // Inisialisasi peta
   let map, marker;
@@ -382,7 +379,6 @@
           updateCoordinates(marker.getLatLng());
         },
         (error) => {
-          alert("Izinkan akses lokasi atau drag pin manual");
           console.log("Geolocation error:", error);
         },
         { timeout: 10000 }
@@ -483,91 +479,75 @@
 
   async function submitForm() {
     const btn = document.querySelector('.submit-btn');
+    const originalBtnText = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
   
     try {
       // 1. Collect basic form data
-      const formData = {
-        'restaurant-name': document.getElementById('restaurant-name').value,
-        'owner-name': document.getElementById('owner-name').value,
-        'phone': document.getElementById('phone').value,
-        'email': document.getElementById('email').value,
-        'address': document.getElementById('address').value,
-        'latitude': document.getElementById('latitude').value,
-        'longitude': document.getElementById('longitude').value,
-        'delivery-rules': document.getElementById('delivery-rules').value,
-        'tax-percentage': document.getElementById('tax-percentage').value,
-        'service-fee': document.getElementById('service-fee').value,
-        'notes': document.getElementById('notes').value,
-        'menu-name': [],
-        'menu-price': [],
-        'menu-desc': [],
-        'menu-photos': []
-      };
+      const formData = new FormData();
+      formData.append('restaurant-name', document.getElementById('restaurant-name').value);
+      formData.append('owner-name', document.getElementById('owner-name').value);
+      formData.append('phone', document.getElementById('phone').value);
+      formData.append('email', document.getElementById('email').value);
+      formData.append('address', document.getElementById('address').value);
+      formData.append('latitude', document.getElementById('latitude').value);
+      formData.append('longitude', document.getElementById('longitude').value);
+      formData.append('delivery-rules', document.getElementById('delivery-rules').value);
+      formData.append('tax-percentage', document.getElementById('tax-percentage').value);
+      formData.append('service-fee', document.getElementById('service-fee').value);
+      formData.append('notes', document.getElementById('notes').value);
 
-      // 2. Process logo image if exists
+      // 2. Add logo if exists
       const logoFile = document.getElementById('logo-upload').files[0];
       if (logoFile) {
-        formData.logo = await getBase64(logoFile);
+        formData.append('logo', logoFile);
       }
 
       // 3. Process menu items
       const menuItems = document.querySelectorAll('.menu-item');
-      menuItems.forEach(async (item, index) => {
-        formData['menu-name'].push(item.querySelector('input[name="menu-name[]"]').value);
-        formData['menu-price'].push(item.querySelector('input[name="menu-price[]"]').value);
-        formData['menu-desc'].push(item.querySelector('textarea[name="menu-desc[]"]').value);
-      
-      // Process menu photos
-      const menuPhoto = item.querySelector('input[name="menu-photo[]"]').files[0];
-      if (menuPhoto) {
-        const photoBase64 = await getBase64(menuPhoto);
-        formData['menu-photos'].push(photoBase64);
-       } else {
-        formData['menu-photos'].push(null);
-       }
+      menuItems.forEach((item, index) => {
+        formData.append('menu-name[]', item.querySelector('input[name="menu-name[]"]').value);
+        formData.append('menu-price[]', item.querySelector('input[name="menu-price[]"]').value);
+        formData.append('menu-desc[]', item.querySelector('textarea[name="menu-desc[]"]').value);
+        
+        // Process menu photos
+        const menuPhoto = item.querySelector('input[name="menu-photo[]"]').files[0];
+        if (menuPhoto) {
+          formData.append('menu-photo[]', menuPhoto);
+        }
       });
 
       // 4. Send data to Google Apps Script Web App
       const response = await fetch(WEB_APP_URL, {
         method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-       },
-       body: JSON.stringify(formData)
-     });
-
-    const result = await response.json();
-    
-    if (result.status === "success") {
-      alert('Data berhasil dikirim!');
-      document.getElementById('registration-form').reset();
-      // Reset preview images
-      document.querySelectorAll('.preview-image').forEach(img => {
-        img.style.display = 'none';
+        body: formData
       });
-    } else {
-      throw new Error(result.message || 'Gagal mengirim data');
+      
+      const result = await response.json();
+      
+      if (result.status === "success") {
+        alert('Data berhasil dikirim!');
+        document.getElementById('registration-form').reset();
+        // Reset preview images
+        document.querySelectorAll('.preview-image').forEach(img => {
+          img.style.display = 'none';
+        });
+        // Reset map to default location
+        map.setView([-6.2088, 106.8456], 13);
+        marker.setLatLng([-6.2088, 106.8456]);
+        updateCoordinates(marker.getLatLng());
+      } else {
+        throw new Error(result.message || 'Gagal mengirim data');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error: ' + error.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = originalBtnText;
     }
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Error: ' + error.message);
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = 'Kirim Formulir';
   }
-}
-
-// Helper function to convert file to base64
-function getBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
-  });
-}
-</script>
+  </script>
 </body>
 </html>
