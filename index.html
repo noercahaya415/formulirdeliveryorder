@@ -1,0 +1,583 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulir Pendaftaran Independent Delivery Order</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <style>
+    /* [Styles tetap sama seperti sebelumnya] */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #d92323;
+      margin-bottom: 30px;
+      font-size: 2.2rem;
+    }
+
+    .form-section {
+      margin-bottom: 30px;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      border-left: 4px solid #d92323;
+    }
+
+    .form-section h2 {
+      color: #d92323;
+      margin-bottom: 15px;
+      font-size: 1.4rem;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: #555;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    input[type="email"],
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .file-upload {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      border: 2px dashed #ccc;
+      border-radius: 5px;
+      background-color: #f8f8f8;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .file-upload:hover {
+      border-color: #d92323;
+      background-color: #fff8f8;
+    }
+
+    .file-upload i {
+      font-size: 40px;
+      color: #d92323;
+      margin-bottom: 10px;
+    }
+
+    .file-upload input {
+      display: none;
+    }
+
+    .preview-image {
+      max-width: 200px;
+      max-height: 200px;
+      margin-top: 15px;
+      border-radius: 5px;
+      display: none;
+    }
+
+    #menu-items {
+      margin-top: 20px;
+    }
+
+    .menu-item {
+      background-color: white;
+      padding: 15px;
+      border-radius: 5px;
+      border: 1px solid #eee;
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    .menu-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .remove-menu {
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .add-btn {
+      background-color: #d92323;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 10px auto;
+      transition: background-color 0.3s;
+    }
+
+    .add-btn:hover {
+      background-color: #a31c1c;
+    }
+
+    .add-btn i {
+      margin-right: 5px;
+    }
+
+    #map-container {
+      height: 300px;
+      width: 100%;
+      margin: 15px 0;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+
+    .submit-btn {
+      background-color: #25D366;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: block;
+      margin: 30px auto 0;
+      width: 100%;
+      max-width: 300px;
+      transition: all 0.3s;
+    }
+
+    .submit-btn:hover {
+      background-color: #128C7E;
+      transform: translateY(-2px);
+    }
+
+    .example-text {
+      font-size: 0.85rem;
+      color: #777;
+      margin-top: 5px;
+      font-style: italic;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+      
+      h1 {
+        font-size: 1.8rem;
+      }
+      
+      .form-section {
+        padding: 15px;
+      }
+    }
+    /* ... (seluruh CSS tetap sama) ... */
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Formulir Pendaftaran Independent Delivery Order</h1>
+    
+    <form id="registration-form">
+      <!-- Informasi Dasar -->
+      <div class="form-section">
+        <h2>Informasi Dasar</h2>
+        <div class="form-group">
+          <label for="restaurant-name">Nama Restoran/Rumah Makan</label>
+          <input type="text" id="restaurant-name" name="restaurant-name" required>
+        </div>
+        <div class="form-group">
+          <label for="owner-name">Nama Pemilik</label>
+          <input type="text" id="owner-name" name="owner-name" required>
+        </div>
+        <div class="form-group">
+          <label for="phone">Nomor Telepon/WhatsApp</label>
+          <input type="tel" id="phone" name="phone" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+      </div>
+      
+      <!-- Logo -->
+      <div class="form-section">
+        <h2>Logo Restoran</h2>
+        <p>Upload logo restoran Anda. Jika belum memiliki logo, kami akan mendesainkannya untuk Anda.</p>
+        
+        <label for="logo-upload" class="file-upload">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <span>Klik untuk upload logo</span>
+          <input type="file" id="logo-upload" name="logo-upload" accept="image/*">
+        </label>
+        <img id="logo-preview" class="preview-image" alt="Preview Logo">
+      </div>
+      
+      <!-- Lokasi -->
+      <div class="form-section">
+        <h2>Lokasi Restoran</h2>
+        <div class="form-group">
+          <label for="address">Alamat Lengkap</label>
+          <textarea id="address" name="address" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Pin Lokasi Restoran di Peta</label>
+          <div id="map-container"></div>
+          <input type="hidden" id="latitude" name="latitude">
+          <input type="hidden" id="longitude" name="longitude">
+        </div>
+      </div>
+      
+      <!-- Menu -->
+      <div class="form-section">
+        <h2>Menu Restoran</h2>
+        <p>Tambahkan menu-menu yang akan ditampilkan di web app delivery order Anda.</p>
+        
+        <div id="menu-items">
+          <!-- Menu items will be added here dynamically -->
+        </div>
+        
+        <button type="button" class="add-btn" id="add-menu-btn">
+          <i class="fas fa-plus"></i> Tambah Menu
+        </button>
+      </div>
+      
+      <!-- Aturan Pengiriman -->
+      <div class="form-section">
+        <h2>Aturan Pengiriman</h2>
+        <div class="form-group">
+          <label for="delivery-rules">Aturan Ongkos Kirim</label>
+          <textarea id="delivery-rules" name="delivery-rules" required>Gratis ongkir untuk jarak ≤ 2km, tambahan Rp 5.000 per km untuk jarak > 2km</textarea>
+          <p class="example-text">Contoh: "Gratis ongkir untuk jarak ≤ 2km, tambahan Rp 5.000 per km untuk jarak > 2km"</p>
+        </div>
+      </div>
+      
+      <!-- Biaya Tambahan -->
+      <div class="form-section">
+        <h2>Biaya Tambahan</h2>
+        <div class="form-group">
+          <label for="tax-percentage">Pajak (%)</label>
+          <input type="number" id="tax-percentage" name="tax-percentage" min="0" max="100" value="10">
+          <p class="example-text">Biarkan 0 jika tidak ingin menerapkan pajak</p>
+        </div>
+        <div class="form-group">
+          <label for="service-fee">Biaya Servis (Rp)</label>
+          <input type="number" id="service-fee" name="service-fee" min="0" value="0">
+          <p class="example-text">Biaya tambahan seperti packing atau penyajian</p>
+        </div>
+      </div>
+      
+      <!-- Catatan Tambahan -->
+      <div class="form-section">
+        <h2>Catatan Tambahan</h2>
+        <div class="form-group">
+          <label for="notes">Permintaan khusus atau informasi tambahan</label>
+          <textarea id="notes" name="notes"></textarea>
+        </div>
+      </div>
+      
+      <button type="submit" class="submit-btn">Kirim Formulir</button>
+    </form>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script>
+    // Konfigurasi
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz99clK9eq0JmFTeIi9LRpxaPUFLXMKljx-0oDSSo2Ahf3uv5CxOqWQcJDxvNybtVFvqQ/exec";
+    
+    // Inisialisasi peta
+    let map, marker;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      initMap();
+      setupEventListeners();
+    });
+
+    // [Fungsi initMap(), updateCoordinates(), setupEventListeners(), dan addNewMenuItem() tetap sama]
+    
+    function initMap() {
+      // Default location (Jakarta)
+      const defaultLocation = [-6.2088, 106.8456];
+      
+      map = L.map('map-container').setView(defaultLocation, 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+      
+      // Marker yang bisa digeser
+      marker = L.marker(defaultLocation, {
+        draggable: true
+      }).addTo(map);
+      
+      // Update koordinat saat marker digeser
+      marker.on('dragend', function(e) {
+        updateCoordinates(marker.getLatLng());
+      });
+      
+      // Coba dapatkan lokasi pengguna
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          function(position) {
+            const userLocation = [position.coords.latitude, position.coords.longitude];
+            map.setView(userLocation, 15);
+            marker.setLatLng(userLocation);
+            updateCoordinates(marker.getLatLng());
+          },
+          function(error) {
+            console.log("Pengguna menolak akses lokasi");
+            updateCoordinates(marker.getLatLng());
+          }
+        );
+      }
+    }
+    
+    function updateCoordinates(latlng) {
+      document.getElementById('latitude').value = latlng.lat;
+      document.getElementById('longitude').value = latlng.lng;
+    }
+    
+    function setupEventListeners() {
+      // Preview logo saat diupload
+      document.getElementById('logo-upload').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            const preview = document.getElementById('logo-preview');
+            preview.src = event.target.result;
+            preview.style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+      
+      // Tambah menu
+      document.getElementById('add-menu-btn').addEventListener('click', addNewMenuItem);
+      
+      // Submit form
+      document.getElementById('registration-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitForm();
+      });
+      
+      // Tambahkan satu menu default saat pertama kali load
+      addNewMenuItem();
+    }
+    
+    function addNewMenuItem() {
+      const menuItemsContainer = document.getElementById('menu-items');
+      const menuId = Date.now(); // ID unik untuk menu
+      
+      const menuItem = document.createElement('div');
+      menuItem.className = 'menu-item';
+      menuItem.innerHTML = `
+        <div class="menu-item-header">
+          <h3>Menu Baru</h3>
+          <button type="button" class="remove-menu" data-id="${menuId}">×</button>
+        </div>
+        <div class="menu-grid">
+          <div class="form-group">
+            <label for="menu-name-${menuId}">Nama Menu</label>
+            <input type="text" id="menu-name-${menuId}" name="menu-name[]" required>
+          </div>
+          <div class="form-group">
+            <label for="menu-price-${menuId}">Harga (Rp)</label>
+            <input type="number" id="menu-price-${menuId}" name="menu-price[]" min="0" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="menu-desc-${menuId}">Deskripsi Menu</label>
+          <textarea id="menu-desc-${menuId}" name="menu-desc[]" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Foto Menu</label>
+          <label for="menu-photo-${menuId}" class="file-upload" style="padding: 10px;">
+            <i class="fas fa-camera"></i>
+            <span>Upload Foto Menu</span>
+            <input type="file" id="menu-photo-${menuId}" name="menu-photo[]" accept="image/*">
+          </label>
+          <img id="menu-preview-${menuId}" class="preview-image" alt="Preview Menu" style="max-width: 150px;">
+        </div>
+      `;
+      
+      menuItemsContainer.appendChild(menuItem);
+      
+      // Setup event listener untuk preview gambar dan tombol hapus
+      document.getElementById(`menu-photo-${menuId}`).addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            const preview = document.getElementById(`menu-preview-${menuId}`);
+            preview.src = event.target.result;
+            preview.style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+      
+      document.querySelector(`.remove-menu[data-id="${menuId}"]`).addEventListener('click', function() {
+        if (document.querySelectorAll('.menu-item').length > 1) {
+          menuItem.remove();
+        } else {
+          alert('Anda harus memiliki minimal satu menu');
+        }
+      });
+    }
+
+    // ========================
+    // FUNGSI BARU UNTUK SUBMIT
+    // ========================
+    async function submitForm() {
+      const btnSubmit = document.querySelector('.submit-btn');
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+      
+      try {
+        // 1. Kumpulkan semua data
+        const data = {
+          'restaurant-name': document.getElementById('restaurant-name').value,
+          'owner-name': document.getElementById('owner-name').value,
+          'phone': document.getElementById('phone').value,
+          'email': document.getElementById('email').value,
+          'address': document.getElementById('address').value,
+          'latitude': document.getElementById('latitude').value,
+          'longitude': document.getElementById('longitude').value,
+          'delivery-rules': document.getElementById('delivery-rules').value,
+          'tax-percentage': document.getElementById('tax-percentage').value,
+          'service-fee': document.getElementById('service-fee').value,
+          'notes': document.getElementById('notes').value,
+          'menu-name': [],
+          'menu-price': [],
+          'menu-desc': [],
+          'menu-photos': []
+        };
+
+        // 2. Ambil data menu
+        document.querySelectorAll('.menu-item').forEach(item => {
+          data['menu-name'].push(item.querySelector('input[name="menu-name[]"]').value);
+          data['menu-price'].push(item.querySelector('input[name="menu-price[]"]').value);
+          data['menu-desc'].push(item.querySelector('textarea[name="menu-desc[]"]').value);
+        });
+
+        // 3. Konversi gambar ke Base64
+        const logoFile = document.getElementById('logo-upload').files[0];
+        if (logoFile) {
+          data.logo = await toBase64(logoFile);
+        }
+
+        // 4. Ambil foto menu
+        const menuPhotoInputs = document.querySelectorAll('input[name="menu-photo[]"]');
+        for (let i = 0; i < menuPhotoInputs.length; i++) {
+          if (menuPhotoInputs[i].files[0]) {
+            data['menu-photos'].push(await toBase64(menuPhotoInputs[i].files[0]));
+          } else {
+            data['menu-photos'].push(null);
+          }
+        }
+
+        // 5. Kirim ke Google Apps Script
+        const response = await fetch(https://script.google.com/macros/s/AKfycbz99clK9eq0JmFTeIi9LRpxaPUFLXMKljx-0oDSSo2Ahf3uv5CxOqWQcJDxvNybtVFvqQ/exec, {
+          method: 'POST',
+          body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === "success") {
+          alert(`✅ Data berhasil dikirim!\nFolder konsumen: ${result.folderUrl}`);
+          document.getElementById('registration-form').reset();
+          document.querySelectorAll('.preview-image').forEach(img => img.style.display = 'none');
+        } else {
+          throw new Error(result.message || 'Gagal mengirim data');
+        }
+      } catch (error) {
+        alert(`❌ Error: ${error.message}`);
+        console.error('Submission error:', error);
+      } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = 'Kirim Formulir';
+      }
+    }
+
+    // Helper untuk konversi file gambar ke Base64
+    function toBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    // Contoh: tampilkan data di console (pada implementasi nyata, kirim ke server)
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
+      
+      alert('Formulir berhasil dikirim! Kami akan segera menghubungi Anda.');
+      document.getElementById('registration-form').reset();
+      document.querySelectorAll('.preview-image').forEach(img => img.style.display = 'none');
+    }
+
+    // [Fungsi lainnya tetap sama]
+  </script>
+</body>
+</html>
