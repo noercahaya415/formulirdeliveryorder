@@ -493,20 +493,7 @@
         body: formData
       });
       
-  function uploadFileToFolder(folderId, fileBlob, fileName) {
-    const folder = DriveApp.getFolderById(folderId);
-    const file = folder.createFile(fileBlob);
-    file.setName(fileName);
-    return file.getUrl();
-   }
-
-  MailApp.sendEmail(
-  data.email, 
-  "Pendaftaran Berhasil", 
-  `Terima kasih ${data['owner-name']}! Data restoran "${data['restaurant-name']}" telah tersimpan.`
-  );
-
-      const result = await response.json();
+       const result = await response.json();
       
       if (result.status === "success") {
         alert('Data berhasil dikirim!');
