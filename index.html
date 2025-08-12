@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Formulir Pendaftaran</title>
-  <title>Independent Delivery Order</title>
+  <title>Formulir Pendaftaran Independent Delivery Order</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <style>
@@ -346,7 +345,7 @@
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
   // Konfigurasi
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyRsuVPGbld8cnVAY1aCaPYyoD49UfdEvLU188VBcZNZKCPcXIkan4QXe_zNIpsFlZ4hA/exec";
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzKTgaInW7hIYDKJ4vupoq6r6pwT3oJpO54gwU-vsWQbAcaHcbLkkAL0LGIbPL8yI3DYA/exec";
   
   // Inisialisasi peta
   let map, marker;
@@ -485,41 +484,10 @@
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
   
     try {
-      // 1. Collect basic form data
-      const formData = new FormData();
-      formData.append('restaurant-name', document.getElementById('restaurant-name').value);
-      formData.append('owner-name', document.getElementById('owner-name').value);
-      formData.append('phone', document.getElementById('phone').value);
-      formData.append('email', document.getElementById('email').value);
-      formData.append('address', document.getElementById('address').value);
-      formData.append('latitude', document.getElementById('latitude').value);
-      formData.append('longitude', document.getElementById('longitude').value);
-      formData.append('delivery-rules', document.getElementById('delivery-rules').value);
-      formData.append('tax-percentage', document.getElementById('tax-percentage').value);
-      formData.append('service-fee', document.getElementById('service-fee').value);
-      formData.append('notes', document.getElementById('notes').value);
-
-      // 2. Add logo if exists
-      const logoFile = document.getElementById('logo-upload').files[0];
-      if (logoFile) {
-        formData.append('logo', logoFile);
-      }
-
-      // 3. Process menu items
-      const menuItems = document.querySelectorAll('.menu-item');
-      menuItems.forEach((item, index) => {
-        formData.append('menu-name[]', item.querySelector('input[name="menu-name[]"]').value);
-        formData.append('menu-price[]', item.querySelector('input[name="menu-price[]"]').value);
-        formData.append('menu-desc[]', item.querySelector('textarea[name="menu-desc[]"]').value);
-        
-        // Process menu photos
-        const menuPhoto = item.querySelector('input[name="menu-photo[]"]').files[0];
-        if (menuPhoto) {
-          formData.append('menu-photo[]', menuPhoto);
-        }
-      });
-
-      // 4. Send data to Google Apps Script Web App
+      // 1. Collect all form data
+      const formData = new FormData(document.getElementById('registration-form'));
+      
+      // 2. Send data to Google Apps Script Web App
       const response = await fetch(WEB_APP_URL, {
         method: 'POST',
         body: formData
