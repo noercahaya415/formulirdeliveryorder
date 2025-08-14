@@ -357,7 +357,127 @@
   });
 
   // Fungsi lainnya tetap sama seperti sebelumnya...
+  function initMap() {
+    // Default location (Jakarta)
+    const defaultLocation = [-6.2088, 106.8456];
+    
+    map = L.map('map-container').setView(defaultLocation, 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    
+    // Marker yang bisa digeser
+    marker = L.marker(defaultLocation, { draggable: true }).addTo(map);
+    
+    marker.on('dragend', function(e) {
+      updateCoordinates(marker.getLatLng());
+    });
+    
+    // Geolocation dengan permission
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const userLocation = [position.coords.latitude, position.coords.longitude];
+          map.setView(userLocation, 15);
+          marker.setLatLng(userLocation);
+          updateCoordinates(marker.getLatLng());
+        },
+        (error) => {
+          console.log("Geolocation error:", error);
+        },
+        { timeout: 10000 }
+      );
+    }
+  }
   
+  function updateCoordinates(latlng) {
+    document.getElementById('latitude').value = latlng.lat;
+    document.getElementById('longitude').value = latlng.lng;
+  }
+  
+  function setupEventListeners() {
+    // Logo upload
+    document.getElementById('logo-upload').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const preview = document.getElementById('logo-preview');
+          preview.src = event.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+    
+    // Menu
+    document.getElementById('add-menu-btn').addEventListener('click', addNewMenuItem);
+    addNewMenuItem(); // Init first menu
+    
+    // Form submit
+    document.getElementById('registration-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      submitForm();
+    });
+  }
+  
+  function addNewMenuItem() {
+    const menuId = Date.now();
+    const menuItem = document.createElement('div');
+    menuItem.className = 'menu-item';
+    menuItem.innerHTML = `
+      <div class="menu-item-header">
+        <h3>Menu Baru</h3>
+        <button type="button" class="remove-menu" data-id="${menuId}">×</button>
+      </div>
+      <div class="menu-grid">
+        <div class="form-group">
+          <label for="menu-name-${menuId}">Nama Menu</label>
+          <input type="text" id="menu-name-${menuId}" name="menu-name[]" required>
+        </div>
+        <div class="form-group">
+          <label for="menu-price-${menuId}">Harga (Rp)</label>
+          <input type="number" id="menu-price-${menuId}" name="menu-price[]" min="0" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="menu-desc-${menuId}">Deskripsi Menu</label>
+        <textarea id="menu-desc-${menuId}" name="menu-desc[]" required></textarea>
+      </div>
+      <div class="form-group">
+        <label>Foto Menu</label>
+        <label for="menu-photo-${menuId}" class="file-upload" style="padding: 10px;">
+          <i class="fas fa-camera"></i>
+          <span>Upload Foto Menu</span>
+          <input type="file" id="menu-photo-${menuId}" name="menu-photo[]" accept="image/*">
+        </label>
+        <img id="menu-preview-${menuId}" class="preview-image" alt="Preview Menu" style="max-width: 150px;">
+      </div>
+    `;
+    
+    document.getElementById('menu-items').appendChild(menuItem);
+    
+    // Preview gambar menu
+    document.getElementById(`menu-photo-${menuId}`).addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const preview = document.getElementById(`menu-preview-${menuId}`);
+          preview.src = event.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+    
+    // Tombol hapus
+    document.querySelector(`.remove-menu[data-id="${menuId}"]`).addEventListener('click', function() {
+      if (document.querySelectorAll('.menu-item').length > 1) {
+        menuItem.remove();
+      } else {
+        alert('Minimal harus ada 1 menu');
+      }
+    });
+  }
   async function submitForm() {
     const btn = document.querySelector('.submit-btn');
     const originalBtnText = btn.innerHTML;
