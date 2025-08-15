@@ -347,7 +347,7 @@
 
   <script>
   // Konfigurasi
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwvGUktazwQU3wqpCvrrTpVqsaePbYbhYF8ZbZOHnNynAvfa-mBs04h8FepqMlc5pqzAw/exec";
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxzbMEpjJh_JEA1aVzDoSsvDECbaPiLWbWD3bWbeE0BZG-_cJ2t1lVd4iMbeC0lPbvamA/exec";
   
   let map, marker;
   
@@ -480,7 +480,7 @@
   }
   // Fungsi submitForm yang diperbaiki
   async function submitForm() {
-  const btn = document.querySelector('.submit-btn');
+    const btn = document.querySelector('.submit-btn');
   const originalBtnText = btn.innerHTML;
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
@@ -489,6 +489,10 @@
     const formElement = document.getElementById('registration-form');
     const formData = new FormData(formElement);
     
+    // Tambahkan latitude dan longitude secara eksplisit
+    formData.append('latitude', document.getElementById('latitude').value);
+    formData.append('longitude', document.getElementById('longitude').value);
+    
     // Kirim data menggunakan fetch dengan FormData asli
     const response = await fetch(WEB_APP_URL, {
       method: 'POST',
@@ -496,37 +500,20 @@
       redirect: 'follow'
     });
     
-    if (response.redirected) {
-      // Handle redirect response from Google Apps Script
-      const result = await fetch(response.url);
-      const resultData = await result.json();
-      
-      if (resultData.status === "success") {
-        alert('Data berhasil dikirim!');
-        formElement.reset();
-        document.querySelectorAll('.preview-image').forEach(img => {
-          img.style.display = 'none';
-        });
-        map.setView([-6.2088, 106.8456], 13);
-        marker.setLatLng([-6.2088, 106.8456]);
-        updateCoordinates(marker.getLatLng());
-      } else {
-        throw new Error(resultData.message || 'Gagal mengirim data');
-      }
+    // Handle response
+    const result = await response.json();
+    
+    if (result.status === "success") {
+      alert('Data berhasil dikirim!');
+      formElement.reset();
+      document.querySelectorAll('.preview-image').forEach(img => {
+        img.style.display = 'none';
+      });
+      map.setView([-6.2088, 106.8456], 13);
+      marker.setLatLng([-6.2088, 106.8456]);
+      updateCoordinates(marker.getLatLng());
     } else {
-      const result = await response.json();
-      if (result.status === "success") {
-        alert('Data berhasil dikirim!');
-        formElement.reset();
-        document.querySelectorAll('.preview-image').forEach(img => {
-          img.style.display = 'none';
-        });
-        map.setView([-6.2088, 106.8456], 13);
-        marker.setLatLng([-6.2088, 106.8456]);
-        updateCoordinates(marker.getLatLng());
-      } else {
-        throw new Error(result.message || 'Gagal mengirim data');
-      }
+      throw new Error(result.message || 'Gagal mengirim data');
     }
     
   } catch (error) {
