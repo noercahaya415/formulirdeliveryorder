@@ -243,6 +243,104 @@
     
     <form id="registration-form" enctype="multipart/form-data">
       <!-- form section sama seperti sebelumnya -->
+      <!-- Informasi Dasar -->
+      <div class="form-section">
+        <h2>Informasi Dasar</h2>
+        <div class="form-group">
+          <label for="restaurant-name">Nama Restoran/Rumah Makan</label>
+          <input type="text" id="restaurant-name" name="restaurant-name" required>
+        </div>
+        <div class="form-group">
+          <label for="owner-name">Nama Pemilik</label>
+          <input type="text" id="owner-name" name="owner-name" required>
+        </div>
+        <div class="form-group">
+          <label for="phone">Nomor Telepon/WhatsApp</label>
+          <input type="tel" id="phone" name="phone" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email">
+        </div>
+      </div>
+      
+      <!-- Logo -->
+      <div class="form-section">
+        <h2>Logo Restoran</h2>
+        <p>Upload logo restoran Anda. Jika belum memiliki logo, kami akan mendesainkannya untuk Anda.</p>
+        
+        <label for="logo-upload" class="file-upload">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <span>Klik untuk upload logo</span>
+          <input type="file" id="logo-upload" name="logo" accept="image/*">
+        </label>
+        <img id="logo-preview" class="preview-image" alt="Preview Logo">
+      </div>
+      
+      <!-- Lokasi -->
+      <div class="form-section">
+        <h2>Lokasi Restoran</h2>
+        <div class="form-group">
+          <label for="address">Alamat Lengkap</label>
+          <textarea id="address" name="address" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Pin Lokasi Restoran di Peta</label>
+          <div id="map-container"></div>
+          <input type="hidden" id="latitude" name="latitude">
+          <input type="hidden" id="longitude" name="longitude">
+        </div>
+      </div>
+      
+      <!-- Menu -->
+      <div class="form-section">
+        <h2>Menu Restoran</h2>
+        <p>Tambahkan menu-menu yang akan ditampilkan di web app delivery order Anda.</p>
+        
+        <div id="menu-items">
+          <!-- Menu items will be added here dynamically -->
+        </div>
+        
+        <button type="button" class="add-btn" id="add-menu-btn">
+          <i class="fas fa-plus"></i> Tambah Menu
+        </button>
+      </div>
+      
+      <!-- Aturan Pengiriman -->
+      <div class="form-section">
+        <h2>Aturan Pengiriman</h2>
+        <div class="form-group">
+          <label for="delivery-rules">Aturan Ongkos Kirim</label>
+          <textarea id="delivery-rules" name="delivery-rules" required>Gratis ongkir untuk jarak ≤ 2km, tambahan Rp 5.000 per km untuk jarak > 2km</textarea>
+          <p class="example-text">Contoh: "Gratis ongkir untuk jarak ≤ 2km, tambahan Rp 5.000 per km untuk jarak > 2km"</p>
+        </div>
+      </div>
+      
+      <!-- Biaya Tambahan -->
+      <div class="form-section">
+        <h2>Biaya Tambahan</h2>
+        <div class="form-group">
+          <label for="tax-percentage">Pajak (%)</label>
+          <input type="number" id="tax-percentage" name="tax-percentage" min="0" max="100" value="10">
+          <p class="example-text">Biarkan 0 jika tidak ingin menerapkan pajak</p>
+        </div>
+        <div class="form-group">
+          <label for="service-fee">Biaya Servis (Rp)</label>
+          <input type="number" id="service-fee" name="service-fee" min="0" value="0">
+          <p class="example-text">Biaya tambahan seperti packing atau penyajian</p>
+        </div>
+      </div>
+      
+      <!-- Catatan Tambahan -->
+      <div class="form-section">
+        <h2>Catatan Tambahan</h2>
+        <div class="form-group">
+          <label for="notes">Permintaan khusus atau informasi tambahan</label>
+          <textarea id="notes" name="notes"></textarea>
+        </div>
+      </div>
+      
+      <button type="submit" class="submit-btn">Kirim Formulir</button>
     </form>
   </div>
 
@@ -360,6 +458,8 @@
       }
     });
   }
+
+  
 
   async function submitForm() {
     const btn = document.querySelector('.submit-btn');
